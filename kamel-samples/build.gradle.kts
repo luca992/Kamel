@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.tasks.AbstractNativeMacApplicationPackageAppDirTask
 import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 import org.jetbrains.kotlin.gradle.plugin.mpp.AbstractExecutable
@@ -37,22 +36,6 @@ android {
         resources {
             excludes += setOf("META-INF/AL2.0", "META-INF/LGPL2.1")
         }
-    }
-
-    sourceSets {
-        named("main") {
-            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-            res.srcDirs("src/androidMain/res", "src/commonMain/resources")
-        }
-    }
-
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
     }
 }
 
@@ -216,6 +199,23 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.ja
         "-Xir-dce-runtime-diagnostic=log"
     )
 }
+
+// todo: remove after https://github.com/icerockdev/moko-resources/issues/392 resolved
+// copy resources from kamel-tests into the proper directory for kamel-samples so they are packaged for
+// the web app
+tasks.register<Copy>("jsCopyResourcesFromKamelTests") {
+    from("../kamel-tests/build/generated/moko/jsMain/iokameltests/res")
+    into("build/generated/moko/jsMain/iokamelsamples/res")
+    dependsOn(":kamel-tests:generateMRjsMain")
+}
+tasks.getByName("jsProcessResources").dependsOn("jsCopyResourcesFromKamelTests")
+
+tasks.register<Copy>("desktopCopyResourcesFromKamelTests") {
+    from("../kamel-tests/build/generated/moko/jvmMain/iokameltests/res")
+    into("build/generated/moko/desktopMain/iokamelsamples/res")
+    dependsOn(":kamel-tests:generateMRjvmMain")
+}
+tasks.getByName("desktopProcessResources").dependsOn("desktopCopyResourcesFromKamelTests")
 
 // todo: Remove when resolved: https://github.com/icerockdev/moko-resources/issues/372
 tasks.withType<KotlinNativeLink>()

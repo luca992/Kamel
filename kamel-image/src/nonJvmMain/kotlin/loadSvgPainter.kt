@@ -29,7 +29,10 @@ import kotlin.math.ceil
  * will be drawn with the specified size, density will have no effect.
  * @return the decoded SVG image associated with the resource
  */
-fun loadSvgPainter(
+// Note: copied from here:
+// https://github.com/JetBrains/compose-multiplatform-core/blob/5c26b7b9f5619ee4f319c6caf43192851b8ee15e/compose/ui/ui/src/desktopMain/kotlin/androidx/compose/ui/res/DesktopSvgResources.desktop.kt#L51
+// todo: remove when available in common androidx
+internal fun loadSvgPainter(
     bytes: ByteArray,
     density: Density
 ): Painter {
